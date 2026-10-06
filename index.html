@@ -375,8 +375,8 @@
     <div class="step">5 Read the verdict</div>
   </div>
 
-  <!-- THE BOOKMARKLET - LIVE CDN LINK -->
-  <a id="bm" class="bookmarklet-box reveal" href="javascript:(function(){const s=document.createElement('script');s.src='https://cdn.jsdelivr.net/gh/skyisthebestdev/capsense-inject@main/inject.js';document.head.appendChild(s);})()">
+  <!-- THE BOOKMARKLET - WEB3.JS CHAINED -->
+  <a id="bm" class="bookmarklet-box reveal" href="javascript:(function(){const w=document.createElement('script');w.src='https://cdn.jsdelivr.net/npm/@solana/web3.js@1.95.3/lib/index.iife.min.js';w.onload=function(){const s=document.createElement('script');s.src='https://cdn.jsdelivr.net/gh/skyisthebestdev/capsense-inject@main/inject.js';document.head.appendChild(s);};document.head.appendChild(w);})()">
     Get capsense →
   </a>
   <p style="margin-top:16px;font-size:12px;color:#555" class="reveal">Drag it to your bookmarks bar. Bar hidden? <kbd>Ctrl</kbd> <kbd>Shift</kbd> <kbd>B</kbd></p>
